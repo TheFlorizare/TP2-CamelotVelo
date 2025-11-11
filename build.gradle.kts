@@ -27,7 +27,7 @@ tasks.withType<JavaCompile> {
 
 application {
     mainModule.set("ca.qc.bdeb.sim.tp2camelotvelo")
-    mainClass.set("ca.qc.bdeb.sim.tp2camelotvelo.HelloApplication")
+    mainClass.set("ca.qc.bdeb.sim.tp2camelotvelo.MainJavaFX")
 }
 
 javafx {
