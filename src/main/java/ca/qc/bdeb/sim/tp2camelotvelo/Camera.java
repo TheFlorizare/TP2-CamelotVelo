@@ -7,7 +7,7 @@ public class Camera {
     private Point2D positionCamera;
 
     public Point2D coordEcran(Point2D positionMonde) {
-        return positionMonde.substract(positionCamera);
+        return positionMonde.subtract(positionCamera);
     }
 
     public void update(double deltaTemps) {
