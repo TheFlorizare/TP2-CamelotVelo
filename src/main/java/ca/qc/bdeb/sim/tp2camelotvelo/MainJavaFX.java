@@ -12,6 +12,7 @@ import javafx.stage.Stage;
 import javafx.scene.canvas.GraphicsContext;
 
 import java.io.IOException;
+import java.util.Random;
 
 public class MainJavaFX extends Application {
 
