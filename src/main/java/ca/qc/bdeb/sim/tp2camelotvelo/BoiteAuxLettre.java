@@ -4,7 +4,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
-public class BoiteAuxLettre extends ObjetDuJeu{
+public class BoiteAuxLettre extends ObjetDuJeu {
 
     private Image boite = new Image("boite-aux-lettres.png");
     private Image boiteRouge = new Image("boite-aux-lettres-rouge.png");

@@ -6,6 +6,11 @@ import java.util.Random;
 
 public class Partie {
 
+    private BoiteAuxLettre[] boites = new BoiteAuxLettre[12];
+    private Fenetre[] fenetres = new Fenetre[nombreFenetre()];
+    private Camelot camelot;
+    private Camera camera;
+
     private int nombreFenetre() {
         Random r = new Random();
         int nbFenetreInitiale = 12;
@@ -14,24 +19,24 @@ public class Partie {
         return nbFenetre;
     }
 
-    private BoiteAuxLettre[] boites = new BoiteAuxLettre[12];
-    private Fenetre[] fenetres = new Fenetre[nombreFenetre()];
-    private Camelot camelot;
-    private Camera camera;
+    Partie() {
+        camelot = new Camelot();
+
+    }
 
     public void draw(GraphicsContext context) {
 
-    }
-    public void update(double deltaTemps) {
-
-
-        for (int i = 0; i < boites.length; i++) {
-
-
-        }
+        camelot.draw(context);
 
         for (var boite : boites)
             boite.draw(context);
 
+        for (var fenetre : fenetres)
+            fenetre.draw(context);
+
+    }
+    public void update(double deltaTemps) {
+
+        camelot.update(deltaTemps);
     }
 }
