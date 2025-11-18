@@ -1,17 +1,15 @@
 package ca.qc.bdeb.sim.tp2camelotvelo;
 
-import com.sun.tools.javac.Main;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.effect.Light;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 
 public class Camelot extends ObjetDuJeu {
 
-    protected Image camelot1 = new Image("camelot1.png");
-    protected Image camelot2 = new Image("camelot2.png");
+    protected Image camelot1 = new Image("/Assets/camelot1.png");
+    protected Image camelot2 = new Image("/Assets/camelot2.png");
     protected boolean toucherSol;
 
     @Override
@@ -60,6 +58,5 @@ public class Camelot extends ObjetDuJeu {
                 Math.clamp(position.getX(), 0, MainJavaFX.WIDTH - taille.getX()),
                 Math.clamp(position.getY(), 0, MainJavaFX.HEIGHT - taille.getY()));
 
-        int index = (tempsTotal*4) % 2;
     }
 }

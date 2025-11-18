@@ -1,27 +1,29 @@
 package ca.qc.bdeb.sim.tp2camelotvelo;
 
+
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 
-public class Camera {
-
-    public Point2D coordEcran(Point2D positionMonde) {
-        return positionMonde.subtract(positionCamera);
+public class Camera extends ObjetDuJeu {
+    public Camera(Camelot c) {
+        this.position = new Point2D(c.position.getX(), 0);
+        this.acceleration = new Point2D(c.position.getX(), 0);
+        this.velocite = new Point2D(c.position.getX(), 0);
     }
 
-    public void update(double deltaTemps) {
+    public Point2D coordEcran(Point2D positionMonde) {
+        return positionMonde.subtract(position);
+    }
 
-        positionCamera = positionCamera.add(velocite.multiply(deltaTemps));
+    public void update(Camelot c) {
+
+        position = new Point2D(c.position.getX(), 0);
+        acceleration = new Point2D(c.position.getX(), 0);
+        velocite = new Point2D(c.position.getX(), 0);
     }
 
     public void draw(GraphicsContext context) {
-        context.setFill(color);
 
-        var coordoEcran = camera.coordoEcran(position);
-
-        context.fillRect(
-                position.getX(), position.getY(), taille.getX(), taille.getY());
-        )
     }
 
 }

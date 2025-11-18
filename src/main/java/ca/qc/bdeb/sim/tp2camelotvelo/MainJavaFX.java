@@ -14,7 +14,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-
+//C:\Users\zacha\Documents\TP2-CamelotVelo
 public class MainJavaFX extends Application {
 
     public static final double WIDTH = 640, HEIGHT = 480;

@@ -20,7 +20,9 @@ public class Partie {
     }
 
     Partie() {
-        camelot = new Camelot();
+        this.camelot = new Camelot();
+        this.camera = new Camera(camelot);
+
 
     }
 
@@ -38,5 +40,6 @@ public class Partie {
     public void update(double deltaTemps) {
 
         camelot.update(deltaTemps);
+        camera.update(camelot);
     }
 }
