@@ -59,7 +59,5 @@ public class Camelot extends ObjetDuJeu {
         position = new Point2D(
                 Math.clamp(position.getX(), 0, MainJavaFX.WIDTH - taille.getX()),
                 Math.clamp(position.getY(), 0, MainJavaFX.HEIGHT - taille.getY()));
-
-        int index = (tempsTotal*4) % 2;
     }
 }

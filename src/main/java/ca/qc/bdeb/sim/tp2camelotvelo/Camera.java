@@ -21,7 +21,7 @@ public class Camera {
 
         context.fillRect(
                 position.getX(), position.getY(), taille.getX(), taille.getY());
-        )
+
     }
 
 }
