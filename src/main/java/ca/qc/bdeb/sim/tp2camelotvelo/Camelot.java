@@ -29,6 +29,7 @@ public class Camelot extends ObjetDuJeu {
 
     public void update(double deltaTemps) {
 
+        // Changement d'image camelot
         int index = (int) ((deltaTemps*4)%2);
 
         if (index == 0) {
