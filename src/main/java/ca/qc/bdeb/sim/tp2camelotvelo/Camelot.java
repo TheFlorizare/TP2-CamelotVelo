@@ -12,14 +12,11 @@ public class Camelot extends ObjetDuJeu {
 
     protected Image camelot1 = new Image("camelot1.png");
     protected Image camelot2 = new Image("camelot2.png");
+    protected ImageView camelotView = new  ImageView(camelot1);
     protected boolean toucherSol;
 
     @Override
     public void draw(GraphicsContext context) {
-
-        var viewCamelot1 = new ImageView(camelot1);
-
-        viewCamelot1.setPreserveRatio(true);
     }
 
     public Camelot() {
@@ -31,6 +28,15 @@ public class Camelot extends ObjetDuJeu {
     }
 
     public void update(double deltaTemps) {
+
+        int index = (int) ((deltaTemps*4)%2);
+
+        if (index == 0) {
+            camelotView.setImage(camelot1);
+        } else if (index == 1) {
+            camelotView.setImage(camelot2);
+        }
+
         boolean droite = Input.isKeyPressed(KeyCode.RIGHT);
         boolean gauche = Input.isKeyPressed(KeyCode.LEFT);
         boolean saut = Input.isKeyPressed(KeyCode.SPACE)
