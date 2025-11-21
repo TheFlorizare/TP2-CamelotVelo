@@ -17,4 +17,8 @@ public class BoiteAuxLettre extends ObjetDuJeu {
 
         viewBoite.setPreserveRatio(true);
     }
+
+    public void update(double deltaTemps) {
+
+    }
 }
