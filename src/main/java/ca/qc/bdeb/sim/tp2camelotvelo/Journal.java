@@ -11,13 +11,13 @@ import java.util.Random;
 public class Journal extends ObjetDuJeu {
 
     Random r = new Random();
-    protected Image journal = new Image("assets/journal.png");
+    protected Image journal = new Image("/assets/journal.png");
     protected double masse = r.nextDouble(2);;
     private double cooldown = 0;
 
     public Journal(Point2D positionCamelot, Point2D vitesseCamelot, Point2D quantiteMouvement, double masseJournal) {
 
-        Point2D vitesseInitale = vitesseCamelot + (quantiteMouvement/masseJournal);
+        Point2D vitesseInitale = vitesseCamelot + quantiteMouvement/masseJournal;
         this.velocite = vitesseCamelot;
         this.position = positionCamelot;
         this.masse = masseJournal;
@@ -62,12 +62,12 @@ public class Journal extends ObjetDuJeu {
 
         Journal x = new Journal(creationJournal, velocite, projection, masse);
 
-        Partie.journaux.add(x);
         cooldown = 0.5;
 
         if (cooldown <= 0 && Input.isKeyPressed(KeyCode.Z)) {
             lancerJournal(new Point2D(900, -900));
         }
+
         if (cooldown <= 0 && Input.isKeyPressed(KeyCode.X)) {
             lancerJournal(new Point2D(150, -1100));
         }
