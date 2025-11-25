@@ -7,10 +7,12 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 public class Partie {
-
+    private Maison[] maisons = new Maison[12];
+    private Random random = new Random();
     private BoiteAuxLettre[] boites = new BoiteAuxLettre[12];
     private Fenetre[] fenetres = new Fenetre[nombreFenetre()];
     private Camelot camelot;
@@ -19,12 +21,10 @@ public class Partie {
     private Image ImgJournal = new Image(getClass().getResourceAsStream("/Assets/icone-journal.png"));
     private Image ImgArgent = new Image(getClass().getResourceAsStream("/Assets/icone-dollar.png"));
     private Image ImgMaison = new Image(getClass().getResourceAsStream("/Assets/icone-maison.png"));
+    private Image ImgPorte = new Image(getClass().getResourceAsStream("/Assets/porte.png"));
     public static final double LARGEUR_NIVEAU = 999999999;
     private int nbJournal = 12;
     private int nbArgent = 0;
-
-
-
 
 
     private int nombreFenetre() {
@@ -39,6 +39,20 @@ public class Partie {
         camelot = new Camelot();
         camera = new Camera(MainJavaFX.WIDTH);
         brique = new Image(getClass().getResource("/Assets/brique.png").toExternalForm());
+        int adresse = 100 + random.nextInt(851);
+        double xMaison = 1300;
+
+        for (int i = 0; i < maisons.length; i++) {
+
+            boolean abonnee = random.nextBoolean();
+
+            maisons[i] = new Maison(xMaison, adresse, abonnee);
+
+            adresse += 2;
+
+            xMaison += 1300;
+        }
+
 
 
     }
@@ -48,8 +62,7 @@ public class Partie {
 
         double w = brique.getWidth();
         double h = brique.getHeight();
-        context.setFill(Color.rgb(0,0,0,0.5));
-
+        context.setFill(Color.rgb(0, 0, 0, 0.5));
 
 
         for (double x = 0; x < LARGEUR_NIVEAU; x += w) {
@@ -70,10 +83,16 @@ public class Partie {
 
         context.drawImage(ImgMaison, 210, 10);
 
-        context.setFill(Color.rgb(255,255,255,0.5));
+        context.setFill(Color.rgb(255, 255, 255, 0.5));
         context.setFont(new Font(30));
-        context.fillText(String.valueOf(nbJournal),ImgJournal.getWidth()+20,35);
-        context.fillText(String.valueOf(nbArgent)+"$",170,35);
+        context.fillText(String.valueOf(nbJournal), ImgJournal.getWidth() + 20, 35);
+        context.fillText(String.valueOf(nbArgent) + "$", 170, 35);
+
+        for (Maison m : maisons) {
+            m.draw(context, camera);
+        }
+
+
 
 
         // for (var boite : boites)

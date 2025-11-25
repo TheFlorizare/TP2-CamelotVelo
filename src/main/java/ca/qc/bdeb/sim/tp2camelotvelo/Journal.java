@@ -14,13 +14,15 @@ public class Journal extends ObjetDuJeu {
     protected Image journal = new Image("/assets/journal.png");
     protected double masse = r.nextDouble(2);;
     private double cooldown = 0;
+    private boolean presence = true;
+
 
     public Journal(Point2D positionCamelot, Point2D vitesseCamelot, Point2D quantiteMouvement, double masseJournal) {
 
-        Point2D vitesseInitale = vitesseCamelot + quantiteMouvement/masseJournal;
-        this.velocite = vitesseCamelot;
+        this.velocite = vitesseCamelot.add(quantiteMouvement.multiply(1.0/masseJournal));
         this.position = positionCamelot;
         this.masse = masseJournal;
+        this.acceleration = Point2D.ZERO;
 
         taille = new Point2D(52,31);
     }
@@ -37,15 +39,27 @@ public class Journal extends ObjetDuJeu {
 
     public void update(double deltaTemps) {
 
-        acceleration = new Point2D(0, 1500);
+        Point2D gravite = new Point2D(0, 1500);
+
+        acceleration = gravite;
 
         velocite = velocite.add(acceleration.multiply(deltaTemps));
 
-        double module = velocite.magnitude();
-        if (module > 1500) {
-            velocite = velocite.multiply(1500 / module);
+        double max = 1500;
+        double moduleVitesse = velocite.magnitude();
+        if (moduleVitesse > max) {
+            velocite = velocite.multiply(max/moduleVitesse);
         }
+
         position = position.add(velocite.multiply(deltaTemps));
+
+        if (cooldown <= 0 && Input.isKeyPressed(KeyCode.Z)) {
+            lancerJournal(new Point2D(900, -900));
+        }
+
+        if (cooldown <= 0 && Input.isKeyPressed(KeyCode.X)) {
+            lancerJournal(new Point2D(150, -1100));
+        }
 
         cooldown -= deltaTemps;
     }
@@ -56,21 +70,18 @@ public class Journal extends ObjetDuJeu {
             projection = projection.multiply(1.5);
         }
 
-        Point2D creationJournal = new Point2D(
+        Point2D creationPositionJournal = new Point2D(
                 position.getX() + taille.getX() / 2,
                 position.getY() + taille.getY());
 
-        Journal x = new Journal(creationJournal, velocite, projection, masse);
+        Journal j = new Journal(creationPositionJournal, this.velocite, projection, this.masse);
+
+
 
         cooldown = 0.5;
-
-        if (cooldown <= 0 && Input.isKeyPressed(KeyCode.Z)) {
-            lancerJournal(new Point2D(900, -900));
-        }
-
-        if (cooldown <= 0 && Input.isKeyPressed(KeyCode.X)) {
-            lancerJournal(new Point2D(150, -1100));
-        }
     }
 
+    public void detruire() {
+        presence = false;
+    }
 }
