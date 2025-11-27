@@ -199,22 +199,5 @@ public class Partie {
     public ArrayList<ParticulesChargees> getParticules() {
         return particules;
     }
-
-    public void debogageChampElectrique(ArrayList<ParticulesChargees> particules) {
-
-        for (double x = 0; x < LARGEUR_NIVEAU; x += 50) {
-            for (double y = 0; y < HAUTEUR_ECAN; y += 50) {
-                var positionMonde = new Point2D(x, y);
-                var positionEcran = // calculez ça selon votre objet Camera
-// TODO: Seulement faire ça si la position (x, y) est visible dans l'écran
-Point2D force = champElectrique(particules, positionMonde);
-                UtilitairesDessins.dessinerVecteurForce(
-                        positionEcran,
-                        force,
-                        contexteGraphique
-                );
-            }
-        }
-    }
 }
 
