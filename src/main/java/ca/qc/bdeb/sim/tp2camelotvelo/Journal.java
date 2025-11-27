@@ -11,24 +11,29 @@ import java.util.Random;
 public class Journal extends ObjetDuJeu {
 
     Random r = new Random();
-    protected Image journal = new Image("/assets/journal.png");
-    protected double masse = r.nextDouble(2);;
-    private double cooldown = 0;
+    private static final double gravite = 1500;
+    private static final double vitesseMax = 1500;
+    protected Image journal;
+    protected double masse;
     private boolean presence = true;
+    private Partie partie;
 
 
-    public Journal(Point2D positionCamelot, Point2D vitesseCamelot, Point2D quantiteMouvement, double masseJournal) {
+    public Journal(Partie partie, Point2D positionCamelot, Point2D vitesseCamelot,
+                   Point2D quantiteMouvement, double masseJournal) {
 
+        this.partie = partie;
         this.velocite = vitesseCamelot.add(quantiteMouvement.multiply(1.0/masseJournal));
         this.position = positionCamelot;
         this.masse = masseJournal;
         this.acceleration = Point2D.ZERO;
-
-        taille = new Point2D(52,31);
+        this.taille = new Point2D(52,31);
+        journal = new Image("/assets/journal.png");
     }
 
     @Override
     public void draw(GraphicsContext context) {
+        if (!presence) return;
         context.drawImage(
                 journal,
                 position.getX(),
@@ -38,47 +43,38 @@ public class Journal extends ObjetDuJeu {
     }
 
     public void update(double deltaTemps) {
+        if (!presence) return;
 
-        Point2D gravite = new Point2D(0, 1500);
-
-        acceleration = gravite;
+        // gravite
+        acceleration = new Point2D(0, 1500);
 
         velocite = velocite.add(acceleration.multiply(deltaTemps));
 
-        double max = 1500;
-        double moduleVitesse = velocite.magnitude();
-        if (moduleVitesse > max) {
-            velocite = velocite.multiply(max/moduleVitesse);
+        if (velocite.magnitude() > vitesseMax) {
+            velocite = velocite.multiply(vitesseMax / velocite.magnitude());
         }
 
         position = position.add(velocite.multiply(deltaTemps));
 
-        if (cooldown <= 0 && Input.isKeyPressed(KeyCode.Z)) {
-            lancerJournal(new Point2D(900, -900));
+        // hors ecran
+        if (position.getX() + taille.getX() < 0 ||
+                position.getX() > MainJavaFX.WIDTH ||
+                position.getY() > MainJavaFX.HEIGHT) {
+            presence = false;
         }
 
-        if (cooldown <= 0 && Input.isKeyPressed(KeyCode.X)) {
-            lancerJournal(new Point2D(150, -1100));
-        }
+        Point2D E = partie.champElectrique(partie.getParticules(), this.getCentre());
 
-        cooldown -= deltaTemps;
+        Point2D forceElectrique = E.multiply(900);
+
+        Point2D accelerationElectrique = acceleration.multiply(1.0 / masse);
+
+        acceleration = new Point2D(0,1500).add(accelerationElectrique);
     }
 
-    public void lancerJournal(Point2D projection) {
 
-        if (Input.isKeyPressed(KeyCode.SHIFT)) {
-            projection = projection.multiply(1.5);
-        }
-
-        Point2D creationPositionJournal = new Point2D(
-                position.getX() + taille.getX() / 2,
-                position.getY() + taille.getY());
-
-        Journal j = new Journal(creationPositionJournal, this.velocite, projection, this.masse);
-
-
-
-        cooldown = 0.5;
+    public boolean estPresent() {
+        return presence;
     }
 
     public void detruire() {

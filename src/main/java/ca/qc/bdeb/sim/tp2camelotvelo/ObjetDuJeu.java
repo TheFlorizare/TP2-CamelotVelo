@@ -21,6 +21,14 @@ public abstract class ObjetDuJeu {
 
     }
 
+    // this = journal, obj = fenetre ou boite
+    public boolean collision(ObjetDuJeu obj) {
+        return this.getDroite() > obj.getGauche() &&
+                this.getGauche() < obj.getDroite() &&
+                this.getBas() > obj.getHaut() &&
+                this.getHaut() < obj.getBas();
+    }
+
     public double getHaut() {
         return position.getY();
     }

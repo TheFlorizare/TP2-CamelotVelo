@@ -14,13 +14,16 @@ public class Camelot extends ObjetDuJeu {
     private static final double GRAVITE = 1500;
     private static final double VITESSE_BASE = 400;
 
+    private double cooldown = 0;
     protected Image camelot1;
     protected Image camelot2;
     protected ImageView camelotView;
     protected boolean toucherSol;
     private double tempsTotal = 0;
 
-    public Camelot() {
+    private Partie partie;
+    public Camelot(Partie partie) {
+        this.partie = partie;
         camelot1 = chargerImage("/Assets/camelot1.png");
         camelot2 = chargerImage("/Assets/camelot2.png");
 
@@ -92,6 +95,16 @@ public class Camelot extends ObjetDuJeu {
             toucherSol = false;
         }
 
+        if (cooldown <= 0 && Input.isKeyPressed(KeyCode.Z)) {
+            creerJournal(new Point2D(900, -900));
+        }
+
+        if (cooldown <= 0 && Input.isKeyPressed(KeyCode.X)) {
+            creerJournal(new Point2D(150, -1100));
+        }
+
+        cooldown -= deltaTemps;
+
         acceleration = new Point2D(ax, GRAVITE);
 
         velocite = velocite.add(acceleration.multiply(deltaTemps));
@@ -116,6 +129,21 @@ public class Camelot extends ObjetDuJeu {
         System.out.println("Position: " + position.getX());
         System.out.println("Acceleration: " + acceleration.getX());
 
+    }
+
+    private void creerJournal(Point2D pos) {
+
+        if (Input.isKeyPressed(KeyCode.SHIFT)) {
+            pos = pos.multiply(1.5);
+        }
+
+        Point2D positionCentral = getCentre();
+
+        Journal j = new Journal(partie, positionCentral, this.velocite, pos, partie.masseJournaux);
+
+        Partie.journaux.add(j);
+
+        cooldown = 0.5;
     }
 
     public Point2D getPosition() {
