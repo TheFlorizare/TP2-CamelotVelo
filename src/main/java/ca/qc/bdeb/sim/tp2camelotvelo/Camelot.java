@@ -152,7 +152,7 @@ public class Camelot extends ObjetDuJeu {
 
         Point2D positionCentral = getCentre();
 
-        Journal j = new Journal(positionCentral, this.velocite, pos, Partie.masseJournaux);
+        Journal j = new Journal(partie, positionCentral, this.velocite, pos, Partie.masseJournaux);
 
         Partie.journaux.add(j);
 

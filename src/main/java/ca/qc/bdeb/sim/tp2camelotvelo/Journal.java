@@ -17,11 +17,11 @@ public class Journal extends ObjetDuJeu {
     protected double masse;
     private boolean presence = true;
     private Image imgJournal = new Image(getClass().getResourceAsStream("/Assets/journal.png"));
+    private Partie partie;
 
 
 
-
-    public Journal(Point2D positionCamelot, Point2D vitesseCamelot,
+    public Journal(Partie partie, Point2D positionCamelot, Point2D vitesseCamelot,
                    Point2D quantiteMouvement, double masseJournal) {
 
         this.velocite = vitesseCamelot.add(quantiteMouvement.multiply(1.0/masseJournal));
@@ -29,6 +29,7 @@ public class Journal extends ObjetDuJeu {
         this.masse = masseJournal;
         this.acceleration = Point2D.ZERO;
         this.taille = new Point2D(52,31);
+        this.partie = partie;
 
     }
     @Override
@@ -52,9 +53,19 @@ public class Journal extends ObjetDuJeu {
     public void update(double deltaTemps) {
         if (!presence) return;
 
-        // gravite
-        acceleration = new Point2D(0, gravite);
+        if ( partie.getParticules().isEmpty()) {
+            acceleration = new Point2D(0, gravite);
+        }
+        else {
+            Point2D E = partie.champElectrique(partie.getParticules(), this.getCentre());
 
+            Point2D forceElectrique = E.multiply(900);
+
+            Point2D accelerationElectrique = forceElectrique.multiply(1 / masse);
+
+            acceleration = new Point2D(0,1500).add(accelerationElectrique);
+        }
+        // gravite
         velocite = velocite.add(acceleration.multiply(deltaTemps));
 
         if (velocite.magnitude() > vitesseMax) {
@@ -68,7 +79,6 @@ public class Journal extends ObjetDuJeu {
         if (position.getY() > MainJavaFX.HEIGHT + 200) {
             presence = false;
         }
-
     }
 
     public boolean estPresent() {

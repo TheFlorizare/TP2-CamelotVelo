@@ -2,6 +2,7 @@ package ca.qc.bdeb.sim.tp2camelotvelo;
 
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.effect.Light;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -15,9 +16,11 @@ public class Partie {
     private Random r = new Random();
     private BoiteAuxLettre[] boites = new BoiteAuxLettre[12];
     private Fenetre[] fenetres = new Fenetre[nombreFenetre()];
+    public static ArrayList<ParticulesChargees> particules = new ArrayList<>();
     public static ArrayList<Journal> journaux = new ArrayList<>();
     private Camelot camelot;
     private Camera camera;
+    private Camera cameraParticules;
     private Image brique;
     private Image ImgJournal = new Image(getClass().getResourceAsStream("/Assets/icone-journal.png"));
     private Image ImgArgent = new Image(getClass().getResourceAsStream("/Assets/icone-dollar.png"));
@@ -26,7 +29,11 @@ public class Partie {
     public static final double LARGEUR_NIVEAU = 999999999;
     private int nbJournal = 12;
     private int nbArgent = 0;
+    private int niveau = 2;
     private double espace = 300;
+
+    private boolean modeDebogage = false;
+    private boolean modeDebogageChamp = false;
 
 
     private int nombreFenetre() {
@@ -44,6 +51,7 @@ public class Partie {
         int adresse = 100 + r.nextInt(851);
         double xMaison = 1300;
         masseJournaux = r.nextDouble(2);
+        creationParticules();
 
         for (int i = 0; i < maisons.length; i++) {
 
@@ -55,12 +63,9 @@ public class Partie {
 
             xMaison += 1300;
         }
-
-
     }
 
     public void draw(GraphicsContext context) {
-
 
         double w = brique.getWidth();
         double h = brique.getHeight();
@@ -106,9 +111,47 @@ public class Partie {
 
         camelot.draw(context, camera);
 
+        if (niveau >=2) {
+            for (ParticulesChargees p : particules) {
+                p.draw(context, camera);
+            }
+        }
 
+        if (modeDebogageChamp) {
+            for (double x = 0; x < LARGEUR_NIVEAU; x +=50) {
+                for (double y = 0; y < MainJavaFX.HEIGHT; y +=50) {
+
+                    var positionMonde = new Point2D(x,y);
+                    var positionEcran = camera.coordEcran(positionMonde);
+
+                    if (positionEcran.getX() < 0 || positionEcran.getX() > MainJavaFX.WIDTH) {
+                        continue;
+                    }
+
+                    Point2D force = champElectrique(particules, positionMonde);
+
+                    UtilitairesDessins.dessinerVecteurForce(positionEcran, force, context);
+                }
+            }
+        }
+
+        if (modeDebogage) {
+
+            for (Journal j : journaux) {
+                Point2D position = camera.coordEcran(j.position);
+            }
+
+            for (Fenetre f : fenetres) {
+                Point2D position = camera.coordEcran(f.position);
+            }
+
+            for (BoiteAuxLettre b : boites) {
+                Point2D position = camera.coordEcran(b.position);
+            }
+            context.setLineWidth(2);
+            context.setStroke(Color.YELLOW);
+        }
     }
-
 
     public void update(double deltaTemps) {
 
@@ -139,6 +182,11 @@ public class Partie {
         }
     }
 
+    public void creationParticules() {
+        for (int i = 0; i<15; i++) {
+            particules.add(new ParticulesChargees(r.nextDouble(3000), r.nextDouble(MainJavaFX.HEIGHT)));
+        }
+    }
 
     private void collisionBoite(Journal j, BoiteAuxLettre b) {
 
@@ -164,6 +212,41 @@ public class Partie {
 
     public double getMasseJournaux() {
         return masseJournaux;
+    }
+
+    public Point2D champElectrique(ArrayList<ParticulesChargees> particules, Point2D position) {
+
+        Point2D total = Point2D.ZERO;
+
+        for (ParticulesChargees p : particules) {
+
+            double dx = position.getX() - p.position.getX(); // posX journal - posX particule
+            double dy = position.getY() - p.position.getY();
+            double distance = Math.sqrt(dx * dx + dy * dy);
+
+            if (distance < 1) {
+                distance = 1;
+            }
+
+            double Ei = 90*900 / (distance*distance); // K*q/r2
+
+            Point2D direction = new Point2D(dx, dy).normalize();
+
+            total = total.add(direction.multiply(Ei));
+        }
+        return total;
+    }
+
+    public ArrayList<ParticulesChargees> getParticules() {
+        return particules;
+    }
+
+    public void activerDebogage() {
+        modeDebogage = !modeDebogage;
+    }
+
+    public void activerDebogageChamp() {
+        modeDebogageChamp = !modeDebogageChamp;
     }
 }
 

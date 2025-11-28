@@ -1,7 +1,6 @@
 package ca.qc.bdeb.sim.tp2camelotvelo;
 
 import javafx.geometry.Point2D;
-import javafx.scene.Camera;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
@@ -19,7 +18,9 @@ public class ParticulesChargees {
     }
 
     public void draw(GraphicsContext context, Camera camera) {
+        Point2D posEcran = camera.coordEcran(position);
         context.setFill(couleur);
-        context.fillOval(position.getX() - 10, position.getY() - 10, 20, 20);
+        context.fillOval(posEcran.getX() - 10, posEcran.getY() - 10, 20, 20);
     }
 }
+

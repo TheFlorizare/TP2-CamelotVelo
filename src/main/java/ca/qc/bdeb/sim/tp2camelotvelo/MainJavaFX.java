@@ -17,7 +17,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 public class MainJavaFX extends Application {
-
+    
 
     public static final double WIDTH = 900, HEIGHT = 480;
 
@@ -28,6 +28,7 @@ public class MainJavaFX extends Application {
 
     private boolean scenePrincipale = true;
     private boolean niveau2 = false;
+    private Partie partie;
 
     @Override
     public void start(Stage stage) {
@@ -42,7 +43,7 @@ public class MainJavaFX extends Application {
         stage.show();
 
 
-        Partie partie = new Partie();
+        this.partie = new Partie();
 
 
         AnimationTimer timer = new AnimationTimer() {
@@ -77,8 +78,6 @@ public class MainJavaFX extends Application {
 
                     partie.draw(contextNiveau);
                 }
-
-
             }
         };
 
@@ -116,6 +115,12 @@ public class MainJavaFX extends Application {
         root.getChildren().add(canvas);
         Scene scene = new Scene(root, WIDTH, HEIGHT);
         scene.setOnKeyPressed((e) -> {
+            if (e.getCode() == KeyCode.D) {
+                partie.activerDebogage();
+            }
+            if (e.getCode() == KeyCode.F) {
+                partie.activerDebogageChamp();
+            }
             if (e.getCode() == KeyCode.ESCAPE) {
                 Platform.exit();
             } else {
