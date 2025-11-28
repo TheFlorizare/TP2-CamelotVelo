@@ -10,13 +10,12 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class Partie {
+    public static double masseJournaux;
     private Maison[] maisons = new Maison[12];
     private Random r = new Random();
     private BoiteAuxLettre[] boites = new BoiteAuxLettre[12];
     private Fenetre[] fenetres = new Fenetre[nombreFenetre()];
     public static ArrayList<Journal> journaux = new ArrayList<>();
-    private ArrayList<ParticulesChargees> particules = new  ArrayList<>();
-    public double masseJournaux;
     private Camelot camelot;
     private Camera camera;
     private Image brique;
@@ -27,8 +26,7 @@ public class Partie {
     public static final double LARGEUR_NIVEAU = 999999999;
     private int nbJournal = 12;
     private int nbArgent = 0;
-    private boolean modeDegogage = false;
-    private boolean debogageChampE = false;
+    private double espace = 300;
 
 
     private int nombreFenetre() {
@@ -38,7 +36,6 @@ public class Partie {
         int nbFenetre = (nbFenetreInitiale + ajoutFenetre);
         return nbFenetre;
     }
-
 
     Partie() {
         camelot = new Camelot(this);
@@ -58,7 +55,6 @@ public class Partie {
 
             xMaison += 1300;
         }
-
 
 
     }
@@ -91,65 +87,58 @@ public class Partie {
 
         context.setFill(Color.rgb(255, 255, 255, 0.5));
         context.setFont(new Font(30));
-        context.fillText(String.valueOf(nbJournal), ImgJournal.getWidth() + 20, 35);
+        context.fillText(String.valueOf(journaux.size()), ImgJournal.getWidth() + 20, 35);
         context.fillText(String.valueOf(nbArgent) + "$", 170, 35);
 
         for (Maison m : maisons) {
             m.draw(context, camera);
+            if (m.isAbonnee()) {
+                context.fillText(String.valueOf(m.getAdresse()), espace, 35);
+                espace += 55;
+            }
         }
 
-        // dessine les journaux
+        espace = 250;
         for (Journal j : journaux) {
-            j.draw(context);
+            j.draw(context, camera);
         }
 
 
-        // for (var boite : boites)
-        //boite.draw(context);
-
-        // for (var fenetre : fenetres)
-        // fenetre.draw(context);
-
-        Point2D posMonde = camelot.getPosition();
-        Point2D posEcran = camera.coordEcran(posMonde);
-
-        context.drawImage(
-                camelot.getImageCourante(),
-                posEcran.getX(),
-                posEcran.getY(),
-                camelot.getTaille().getX(),
-                camelot.getTaille().getY()
-        );
+        camelot.draw(context, camera);
 
 
     }
+
 
     public void update(double deltaTemps) {
 
         camelot.update(deltaTemps);
         camera.update(camelot);
 
-        for (Journal j : journaux) {
+        for (int i = journaux.size() - 1; i >= 0; i--) {
+            Journal j = journaux.get(i);
+
             j.update(deltaTemps);
 
             if (!j.estPresent()) {
-                journaux.remove(j);
+                journaux.remove(i);
+                continue;
             }
 
             for (BoiteAuxLettre b : boites) {
-                if (j.collision(b)) {
-                    collisionBoite(j,b);
+                if (b != null && j.collision(b)) {
+                    collisionBoite(j, b);
                 }
             }
 
             for (Fenetre f : fenetres) {
-                if (j.collision(f)) {
-                    collisionFenetre(j,f);
+                if (f != null && j.collision(f)) {
+                    collisionFenetre(j, f);
                 }
             }
         }
-
     }
+
 
     private void collisionBoite(Journal j, BoiteAuxLettre b) {
 
@@ -173,31 +162,8 @@ public class Partie {
         }
     }
 
-    public Point2D champElectrique(ArrayList<ParticulesChargees> particules, Point2D position) {
-
-        Point2D total = Point2D.ZERO;
-
-        for (ParticulesChargees p : particules) {
-
-            double dx = position.getX() - p.position.getX(); // posX journal - posX particule
-            double dy = position.getY() - p.position.getY();
-            double distance = Math.sqrt(dx * dx + dy * dy);
-
-            if (distance < 1) {
-                distance = 1;
-            }
-
-            double Ei = 90*900 / (distance*distance); // K*q/r2
-
-            Point2D direction = new Point2D(dx, dy).normalize();
-
-            total = total.add(direction.multiply(Ei));
-        }
-        return total;
-    }
-
-    public ArrayList<ParticulesChargees> getParticules() {
-        return particules;
+    public double getMasseJournaux() {
+        return masseJournaux;
     }
 }
 

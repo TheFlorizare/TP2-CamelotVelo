@@ -27,4 +27,3 @@ public class Camera {
         return x;
     }
 }
-

@@ -18,8 +18,8 @@ import javafx.stage.Stage;
 
 public class MainJavaFX extends Application {
 
-    public static final double WIDTH = 960, HEIGHT = 720;
 
+    public static final double WIDTH = 900, HEIGHT = 480;
 
     private Scene sceneAccueil;
     private Scene sceneNiveau1;

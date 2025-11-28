@@ -5,7 +5,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
+
 
 import java.net.URL;
 
@@ -22,6 +22,7 @@ public class Camelot extends ObjetDuJeu {
     private double tempsTotal = 0;
 
     private Partie partie;
+
     public Camelot(Partie partie) {
         this.partie = partie;
         camelot1 = chargerImage("/Assets/camelot1.png");
@@ -53,13 +54,16 @@ public class Camelot extends ObjetDuJeu {
     }
 
     @Override
-    public void draw(GraphicsContext context) {
+    public void draw(GraphicsContext context,Camera camera) {
+        Point2D posMonde = position;
+        Point2D posEcran = camera.coordEcran(posMonde);
+
         context.drawImage(
-                camelotView.getImage(),
-                position.getX(),
-                position.getY(),
-                taille.getX(),
-                taille.getY()
+                getImageCourante(),
+                posEcran.getX(),
+                posEcran.getY(),
+                getTaille().getX(),
+                getTaille().getY()
         );
     }
 
@@ -96,12 +100,21 @@ public class Camelot extends ObjetDuJeu {
         }
 
         if (cooldown <= 0 && Input.isKeyPressed(KeyCode.Z)) {
-            creerJournal(new Point2D(900, -900));
+            if (Input.isKeyPressed(KeyCode.SHIFT)) {
+                creerJournal(new Point2D(990, -990));
+            } else {
+                creerJournal(new Point2D(900, -900));
+            }
         }
 
         if (cooldown <= 0 && Input.isKeyPressed(KeyCode.X)) {
-            creerJournal(new Point2D(150, -1100));
+            if (Input.isKeyPressed(KeyCode.SHIFT)) {
+                creerJournal(new Point2D(165, -1210));
+            } else {
+                creerJournal(new Point2D(150, -1100));
+            }
         }
+
 
         cooldown -= deltaTemps;
 
@@ -139,11 +152,13 @@ public class Camelot extends ObjetDuJeu {
 
         Point2D positionCentral = getCentre();
 
-        Journal j = new Journal(partie, positionCentral, this.velocite, pos, partie.masseJournaux);
+        Journal j = new Journal(positionCentral, this.velocite, pos, Partie.masseJournaux);
 
         Partie.journaux.add(j);
 
         cooldown = 0.5;
+        System.out.println("Journal créé avec v = " + j.velocite);
+
     }
 
     public Point2D getPosition() {
@@ -160,4 +175,3 @@ public class Camelot extends ObjetDuJeu {
 
 
 }
-

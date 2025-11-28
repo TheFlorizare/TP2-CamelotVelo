@@ -39,5 +39,12 @@ public class Maison {
                 posEcran.getX() + 120,
                 MainJavaFX.HEIGHT-porte.getHeight()*0.75);
     }
+    public int getAdresse() {
+        return adresse;
+    }
+    public boolean isAbonnee() {
+        return abonnee;
+    }
 
 }
+

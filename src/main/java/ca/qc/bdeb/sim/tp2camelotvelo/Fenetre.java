@@ -21,16 +21,7 @@ public class Fenetre extends ObjetDuJeu {
         this.abonnee = abonnee;
     }
 
-    @Override
-    public void draw(GraphicsContext context) {
 
-        context.drawImage(
-                fenetre,
-                position.getX(),
-                position.getY(),
-                taille.getX(),
-                taille.getY());
-    }
 
 
 
@@ -47,4 +38,10 @@ public class Fenetre extends ObjetDuJeu {
         }
         return false;
     }
+
+    @Override
+    public void draw(GraphicsContext context, Camera camera) {
+
+    }
 }
+

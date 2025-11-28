@@ -11,7 +11,7 @@ public abstract class ObjetDuJeu {
     protected Point2D acceleration;
     protected Point2D taille;
 
-    public abstract void draw(GraphicsContext context);
+    public abstract void draw(GraphicsContext context,Camera camera);
 
     protected void updatePhysique(double deltaTemps) {
 
@@ -19,14 +19,6 @@ public abstract class ObjetDuJeu {
 
     public void update(double deltaTemps) {
 
-    }
-
-    // this = journal, obj = fenetre ou boite
-    public boolean collision(ObjetDuJeu obj) {
-        return this.getDroite() > obj.getGauche() &&
-                this.getGauche() < obj.getDroite() &&
-                this.getBas() > obj.getHaut() &&
-                this.getHaut() < obj.getBas();
     }
 
     public double getHaut() {
@@ -44,4 +36,5 @@ public abstract class ObjetDuJeu {
     public Point2D getCentre() {
         return position.add(taille.multiply(1/2.0));
     }
+
 }

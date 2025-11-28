@@ -16,37 +16,44 @@ public class Journal extends ObjetDuJeu {
     protected Image journal;
     protected double masse;
     private boolean presence = true;
-    private Partie partie;
+    private Image imgJournal = new Image(getClass().getResourceAsStream("/Assets/journal.png"));
 
 
-    public Journal(Partie partie, Point2D positionCamelot, Point2D vitesseCamelot,
+
+
+    public Journal(Point2D positionCamelot, Point2D vitesseCamelot,
                    Point2D quantiteMouvement, double masseJournal) {
 
-        this.partie = partie;
         this.velocite = vitesseCamelot.add(quantiteMouvement.multiply(1.0/masseJournal));
         this.position = positionCamelot;
         this.masse = masseJournal;
         this.acceleration = Point2D.ZERO;
         this.taille = new Point2D(52,31);
-        journal = new Image("/assets/journal.png");
+
+    }
+    @Override
+    public void draw(GraphicsContext context, Camera camera) {
+        if (!presence) return;
+
+        Point2D posEcran = camera.coordEcran(position);
+
+        context.drawImage(
+                imgJournal,
+                posEcran.getX(),
+                posEcran.getY(),
+                taille.getX(),
+                taille.getY()
+        );
     }
 
-    @Override
-    public void draw(GraphicsContext context) {
-        if (!presence) return;
-        context.drawImage(
-                journal,
-                position.getX(),
-                position.getY(),
-                taille.getX(),
-                taille.getY());
-    }
+
+
 
     public void update(double deltaTemps) {
         if (!presence) return;
 
         // gravite
-        acceleration = new Point2D(0, 1500);
+        acceleration = new Point2D(0, gravite);
 
         velocite = velocite.add(acceleration.multiply(deltaTemps));
 
@@ -56,22 +63,13 @@ public class Journal extends ObjetDuJeu {
 
         position = position.add(velocite.multiply(deltaTemps));
 
-        // hors ecran
-        if (position.getX() + taille.getX() < 0 ||
-                position.getX() > MainJavaFX.WIDTH ||
-                position.getY() > MainJavaFX.HEIGHT) {
+
+        // hors monde (on enlève seulement s'il est tombé très bas)
+        if (position.getY() > MainJavaFX.HEIGHT + 200) {
             presence = false;
         }
 
-        Point2D E = partie.champElectrique(partie.getParticules(), this.getCentre());
-
-        Point2D forceElectrique = E.multiply(900);
-
-        Point2D accelerationElectrique = acceleration.multiply(1.0 / masse);
-
-        acceleration = new Point2D(0,1500).add(accelerationElectrique);
     }
-
 
     public boolean estPresent() {
         return presence;
@@ -79,5 +77,11 @@ public class Journal extends ObjetDuJeu {
 
     public void detruire() {
         presence = false;
+    }
+    public boolean collision(ObjetDuJeu obj) {
+        return this.getDroite() > obj.getGauche() &&
+                this.getGauche() < obj.getDroite() &&
+                this.getBas() > obj.getHaut() &&
+                this.getHaut() < obj.getBas();
     }
 }

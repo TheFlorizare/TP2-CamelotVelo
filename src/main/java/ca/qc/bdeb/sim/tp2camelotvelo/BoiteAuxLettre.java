@@ -5,6 +5,9 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
+
+
+
 public class BoiteAuxLettre extends ObjetDuJeu {
 
     private boolean collisionne = false;
@@ -14,21 +17,16 @@ public class BoiteAuxLettre extends ObjetDuJeu {
     private Image boiteRouge = new Image(getClass().getResourceAsStream("boite-aux-lettres-rouge.png"));
     private Image boiteVert = new Image(getClass().getResourceAsStream("boite-aux-lettres-vert.png"));
     private ImageView viewBoite;
+    private int argent = 0;
     public BoiteAuxLettre(double x, double y, boolean abonnee) {
         this.position = new Point2D(x,y);
         this.taille = new Point2D(81,76);
         this.abonnee = abonnee;
     }
-    @Override
-    public void draw(GraphicsContext context) {
 
-        context.drawImage(
-                boite,
-                position.getX(),
-                position.getY(),
-                taille.getX(),
-                taille.getY());
-    }
+
+
+
 
     public boolean devientVert() {
         if (abonnee) {
@@ -43,4 +41,10 @@ public class BoiteAuxLettre extends ObjetDuJeu {
         }
         return false;
     }
+
+    @Override
+    public void draw(GraphicsContext context, ca.qc.bdeb.sim.tp2camelotvelo.Camera camera) {
+
+    }
 }
+
