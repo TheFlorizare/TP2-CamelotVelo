@@ -2,6 +2,7 @@ package ca.qc.bdeb.sim.tp2camelotvelo;
 
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.effect.Light;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -39,6 +40,7 @@ public class Partie {
     private boolean modeDebogage = false;
     private boolean modeDebogageChamp = false;
     private boolean modeDebogageChampTest = false;
+    private boolean creationParticulesDebogage = false;
 
     private int nombreFenetre() {
         Random r = new Random();
@@ -117,14 +119,14 @@ public class Partie {
 
         camelot.draw(context, camera);
 
-        if (niveau2) {
+        if (!niveau2) {
             for (ParticulesChargees p : particules) {
                 p.draw(context, camera);
             }
         }
 
         if (modeDebogageChamp) {
-            if (niveau2) {
+            if (!niveau2) {
                 for (double x = 0; x < LARGEUR_NIVEAU; x +=50) {
                     for (double y = 0; y < MainJavaFX.HEIGHT; y +=50) {
 
@@ -143,6 +145,23 @@ public class Partie {
             }
             else {
                 return;
+            }
+        }
+        else if (modeDebogageChampTest) {
+            for (double x = 0; x < LARGEUR_NIVEAU; x +=50) {
+                for (double y = 0; y < MainJavaFX.HEIGHT; y +=50) {
+
+                    var positionMonde = new Point2D(x,y);
+                    var positionEcran = camera.coordEcran(positionMonde);
+
+                    if (positionEcran.getX() < 0 || positionEcran.getX() > MainJavaFX.WIDTH) {
+                        continue;
+                    }
+
+                    Point2D force = champElectrique(particulesDebogage, positionMonde);
+
+                    UtilitairesDessins.dessinerVecteurForce(positionEcran, force, context);
+                }
             }
         }
 
@@ -170,18 +189,28 @@ public class Partie {
             context.setStroke(Color.YELLOW);
         }
 
-        if (modeDebogageChampTest) {
+        if (modeDebogageChampTest && !creationParticulesDebogage) {
 
-            double haut = 20;
-            double bas = MainJavaFX.HEIGHT - 20;
+            particulesDebogage.clear();
+
+            double haut = 10;
+            double bas = MainJavaFX.HEIGHT - 10;
+            double espace = 0;
 
 
             for (int i = 0; i < 100; i++) {
-                double x = r.nextDouble(LARGEUR_NIVEAU);
 
-                particulesDebogage.add(new ParticulesChargees(x, haut));
-                particulesDebogage.add(new ParticulesChargees(x, bas));
+                particulesDebogage.add(new ParticulesChargees(espace, haut));
+                particulesDebogage.add(new ParticulesChargees(espace, bas));
+                espace += 50;
+
             }
+
+            creationParticulesDebogage = true;
+        }
+
+        if (modeDebogageChampTest) {
+
             for (ParticulesChargees p : particulesDebogage) {
                 Point2D position = camera.coordEcran(p.position);
                 context.setFill(p.couleur);
@@ -220,7 +249,7 @@ public class Partie {
     }
 
     public void creationParticules() {
-        if (niveau2) {
+        if (!niveau2) {
             for (int i = 0; i<100; i++) {
                 particules.add(new ParticulesChargees(r.nextDouble(LARGEUR_NIVEAU), r.nextDouble(MainJavaFX.HEIGHT)));
             }
@@ -274,6 +303,10 @@ public class Partie {
 
     public ArrayList<ParticulesChargees> getParticules() {
         return particules;
+    }
+
+    public ArrayList<ParticulesChargees> getParticulesDebogage() {
+        return particulesDebogage;
     }
 
     public void ajoutJournauxDebogage() {

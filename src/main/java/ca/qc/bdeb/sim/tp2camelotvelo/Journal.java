@@ -53,7 +53,7 @@ public class Journal extends ObjetDuJeu {
     public void update(double deltaTemps) {
         if (!presence) return;
 
-        if ( partie.getParticules().isEmpty()) {
+        if (partie.getParticules().isEmpty()) {
             acceleration = new Point2D(0, gravite);
         }
         else {

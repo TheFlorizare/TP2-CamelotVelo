@@ -22,5 +22,6 @@ public class ParticulesChargees {
         context.setFill(couleur);
         context.fillOval(posEcran.getX() - 10, posEcran.getY() - 10, 20, 20);
     }
+
 }
 
