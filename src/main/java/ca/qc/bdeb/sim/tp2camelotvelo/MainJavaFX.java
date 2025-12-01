@@ -17,7 +17,6 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 public class MainJavaFX extends Application {
-    
 
     public static final double WIDTH = 900, HEIGHT = 480;
 
