@@ -144,7 +144,6 @@ public class Partie {
             else {
                 return;
             }
-
         }
 
         if (modeDebogage) {
@@ -173,8 +172,9 @@ public class Partie {
 
         if (modeDebogageChampTest) {
 
-            double haut = 0;
-            double bas = MainJavaFX.HEIGHT;
+            double haut = 20;
+            double bas = MainJavaFX.HEIGHT - 20;
+
 
             for (int i = 0; i < 100; i++) {
                 double x = r.nextDouble(LARGEUR_NIVEAU);
@@ -185,7 +185,7 @@ public class Partie {
             for (ParticulesChargees p : particulesDebogage) {
                 Point2D position = camera.coordEcran(p.position);
                 context.setFill(p.couleur);
-                context.fillOval(position.getX() - 4, position.getY() - 4, 8, 8);
+                context.fillOval(position.getX() - 4, position.getY() - 4, 20, 20);
             }
         }
     }
@@ -220,8 +220,10 @@ public class Partie {
     }
 
     public void creationParticules() {
-        for (int i = 0; i<100; i++) {
-            particules.add(new ParticulesChargees(r.nextDouble(LARGEUR_NIVEAU), r.nextDouble(MainJavaFX.HEIGHT)));
+        if (niveau2) {
+            for (int i = 0; i<100; i++) {
+                particules.add(new ParticulesChargees(r.nextDouble(LARGEUR_NIVEAU), r.nextDouble(MainJavaFX.HEIGHT)));
+            }
         }
     }
 
