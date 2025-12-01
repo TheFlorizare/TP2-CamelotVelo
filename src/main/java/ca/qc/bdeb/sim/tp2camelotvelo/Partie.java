@@ -166,6 +166,9 @@ public class Partie {
         }
 
         if (modeDebogage) {
+            context.setLineWidth(2);
+            context.setStroke(Color.YELLOW);
+
             for (Journal j : journaux) {
                 Point2D position = camera.coordEcran(j.position);
                 context.strokeRect(position.getX(), position.getY(), j.taille.getX(), j.taille.getY());
@@ -185,8 +188,6 @@ public class Partie {
             Point2D positionCamelot = camera.coordEcran(camelot.position);
             context.strokeRect(positionCamelot.getX(), positionCamelot.getY(), camelot.taille.getX(), camelot.taille.getY());
 
-            context.setLineWidth(2);
-            context.setStroke(Color.YELLOW);
         }
 
         if (modeDebogageChampTest && !creationParticulesDebogage) {
