@@ -121,6 +121,18 @@ public class MainJavaFX extends Application {
             if (e.getCode() == KeyCode.F) {
                 partie.activerDebogageChamp();
             }
+            if (e.getCode() == KeyCode.I) {
+                partie.activerDebogageChampTest();
+            }
+            if (e.getCode() == KeyCode.Q) {
+                partie.ajoutJournauxDebogage();
+            }
+            if (e.getCode() == KeyCode.K) {
+                partie.suppressionJournauxDebogage();
+            }
+            if (e.getCode() == KeyCode.L) {
+                partie.prochainNiveauDebogage();
+            }
             if (e.getCode() == KeyCode.ESCAPE) {
                 Platform.exit();
             } else {
