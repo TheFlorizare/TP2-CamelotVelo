@@ -2,11 +2,12 @@ package ca.qc.bdeb.sim.tp2camelotvelo;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -16,29 +17,33 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 public class MainJavaFX extends Application {
+    
 
-    public static final double WIDTH = 640, HEIGHT = 480;
+    public static final double WIDTH = 900, HEIGHT = 480;
 
     private Scene sceneAccueil;
     private Scene sceneNiveau1;
 
-    private GraphicsContext contextNiveau1;
+    private GraphicsContext contextNiveau;
 
     private boolean scenePrincipale = true;
+    private boolean niveau2 = false;
+    private Partie partie;
 
     @Override
     public void start(Stage stage) {
 
 
         sceneAccueil = creationSceneAccueil(stage);
-        sceneNiveau1 = creationSceneNiveau1();
+        sceneNiveau1 = creationSceneNiveau();
 
 
         stage.setScene(sceneAccueil);
         stage.setTitle("Camelot Vélo");
         stage.show();
 
-        Partie partie = new Partie();
+
+        this.partie = new Partie();
 
 
         AnimationTimer timer = new AnimationTimer() {
@@ -60,14 +65,18 @@ public class MainJavaFX extends Application {
                 if (scenePrincipale && totalElapsed >= 2) {
                     scenePrincipale = false;
                     stage.setScene(sceneNiveau1);
-                }
 
+                }
 
                 if (!scenePrincipale) {
 
-
                     partie.update(deltaTemps);
-                    partie.draw(contextNiveau1);
+
+
+                    contextNiveau.clearRect(0, 0, MainJavaFX.WIDTH, MainJavaFX.HEIGHT);
+
+
+                    partie.draw(contextNiveau);
                 }
             }
         };
@@ -83,9 +92,9 @@ public class MainJavaFX extends Application {
         root.setStyle("-fx-background-color: black;");
 
 
-        Text titre = new Text("Camelot Vélo");
+        Text titre = new Text("Niveau 1");
         titre.setFont(Font.font(40));
-        titre.setFill(Color.WHITE);
+        titre.setFill(Color.GREEN);
 
 
         VBox ui = new VBox(40, titre);
@@ -96,21 +105,32 @@ public class MainJavaFX extends Application {
         return new Scene(root, WIDTH, HEIGHT);
     }
 
-    private Scene creationSceneNiveau1() {
+    private Scene creationSceneNiveau() {
         Pane root = new Pane();
         Canvas canvas = new Canvas(WIDTH, HEIGHT);
-        contextNiveau1 = canvas.getGraphicsContext2D();
-        Image brique = new Image(getClass().getResource("/Assets/brique.png").toExternalForm());
-        double imgWidth = brique.getWidth();
-        double imgHeight = brique.getHeight();
+        contextNiveau = canvas.getGraphicsContext2D();
+        root.setStyle("-fx-background-color: black;");
 
-        for (double x = 0; x < WIDTH; x += imgWidth) {
-            for (double y = 0; y < HEIGHT; y += imgHeight) {
-                contextNiveau1.drawImage(brique, x, y, imgWidth, imgHeight);
-            }
-        }
+
         root.getChildren().add(canvas);
-        return new Scene(root, WIDTH, HEIGHT);
+        Scene scene = new Scene(root, WIDTH, HEIGHT);
+        scene.setOnKeyPressed((e) -> {
+            if (e.getCode() == KeyCode.D) {
+                partie.activerDebogage();
+            }
+            if (e.getCode() == KeyCode.F) {
+                partie.activerDebogageChamp();
+            }
+            if (e.getCode() == KeyCode.ESCAPE) {
+                Platform.exit();
+            } else {
+                Input.setKeyPressed(e.getCode(), true);
+            }
+        });
+        scene.setOnKeyReleased((e) -> {
+            Input.setKeyPressed(e.getCode(), false);
+        });
+        return scene;
     }
 
     public static void main(String[] args) {
