@@ -3,9 +3,7 @@ package ca.qc.bdeb.sim.tp2camelotvelo;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-
-
+import javafx.scene.paint.Color;
 
 
 public class BoiteAuxLettre extends ObjetDuJeu {
@@ -13,38 +11,63 @@ public class BoiteAuxLettre extends ObjetDuJeu {
     private boolean collisionne = false;
     private boolean abonnee;
 
-    private Image boite = new Image(getClass().getResourceAsStream("boite-aux-lettres.png"));
-    private Image boiteRouge = new Image(getClass().getResourceAsStream("boite-aux-lettres-rouge.png"));
-    private Image boiteVert = new Image(getClass().getResourceAsStream("boite-aux-lettres-vert.png"));
-    private ImageView viewBoite;
-    private int argent = 0;
+    private Image imgBoiteNormale = new Image(getClass().getResourceAsStream("/Assets/boite-aux-lettres.png"));
+    private Image imgBoiteRouge = new Image(getClass().getResourceAsStream("/Assets/boite-aux-lettres-rouge.png"));
+    private Image imgBoiteVerte = new Image(getClass().getResourceAsStream("/Assets/boite-aux-lettres-vert.png"));
+    private Image imgBoiteActuelle = imgBoiteNormale;
+
     public BoiteAuxLettre(double x, double y, boolean abonnee) {
-        this.position = new Point2D(x,y);
-        this.taille = new Point2D(81,76);
+        this.position = new Point2D(x, y);
+        this.taille = new Point2D(imgBoiteNormale.getWidth(), imgBoiteNormale.getHeight());
         this.abonnee = abonnee;
     }
 
 
+    public void collisionAvecJournalBoites(Journal j) {
+
+        if (collisionne) return;
 
 
-
-    public boolean devientVert() {
-        if (abonnee) {
-            viewBoite.setImage(boiteVert);
+        if (this.collision(j)) {
+            collisionne = true;
+            j.detruire();
+            changerCouleurBoite();
         }
-        return false;
     }
 
-    public boolean devientRouge() {
-        if (!abonnee) {
-            viewBoite.setImage(boiteRouge);
+    private void changerCouleurBoite() {
+        if (abonnee) {
+            imgBoiteActuelle = imgBoiteVerte;
+            Partie.nbArgent=Partie.nbArgent+1;
+        } else {
+            imgBoiteActuelle = imgBoiteRouge;
         }
-        return false;
     }
 
     @Override
-    public void draw(GraphicsContext context, ca.qc.bdeb.sim.tp2camelotvelo.Camera camera) {
+    public void draw(GraphicsContext context, Camera camera,boolean modeDebogage) {
+        Point2D posEcran = camera.coordEcran(position);
+
+        context.drawImage(
+                imgBoiteActuelle,
+                posEcran.getX(),
+                posEcran.getY(),
+                taille.getX(),
+                taille.getY()
+        );
+        if (modeDebogage) {
+            context.setStroke(Color.YELLOW);
+            context.strokeRect(
+                    posEcran.getX(),
+                    posEcran.getY(),
+                    taille.getX(),
+                    taille.getY()
+            );
+        }
 
     }
-}
 
+    @Override
+    public void update(double deltaTemps) {
+    }
+}

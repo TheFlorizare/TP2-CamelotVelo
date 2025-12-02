@@ -5,6 +5,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
+import javafx.scene.paint.Color;
 
 
 import java.net.URL;
@@ -20,6 +21,8 @@ public class Camelot extends ObjetDuJeu {
     protected ImageView camelotView;
     protected boolean toucherSol;
     private double tempsTotal = 0;
+    private boolean zEtaitEnfoncee = false;
+    private boolean xEtaitEnfoncee = false;
 
     private Partie partie;
 
@@ -38,8 +41,8 @@ public class Camelot extends ObjetDuJeu {
                 MainJavaFX.HEIGHT - taille.getY()
         );
 
-        velocite = new Point2D(VITESSE_BASE, 0);      // 400 px/s vers la droite
-        acceleration = new Point2D(0, GRAVITE);       // gravité vers le bas
+        velocite = new Point2D(VITESSE_BASE, 0);
+        acceleration = new Point2D(0, GRAVITE);
 
         toucherSol = true;
     }
@@ -54,7 +57,7 @@ public class Camelot extends ObjetDuJeu {
     }
 
     @Override
-    public void draw(GraphicsContext context,Camera camera) {
+    public void draw(GraphicsContext context, Camera camera,boolean modeDebogage) {
         Point2D posMonde = position;
         Point2D posEcran = camera.coordEcran(posMonde);
 
@@ -65,8 +68,18 @@ public class Camelot extends ObjetDuJeu {
                 getTaille().getX(),
                 getTaille().getY()
         );
+        if (modeDebogage) {
+            context.setStroke(Color.YELLOW);
+            context.strokeRect(
+                    posEcran.getX(),
+                    posEcran.getY(),
+                    taille.getX(),
+                    taille.getY()
+            );
+        }
     }
 
+    @Override
     public void update(double deltaTemps) {
 
         tempsTotal += deltaTemps;
@@ -77,16 +90,18 @@ public class Camelot extends ObjetDuJeu {
         boolean gauche = Input.isKeyPressed(KeyCode.LEFT);
         boolean saut = Input.isKeyPressed(KeyCode.SPACE)
                 || Input.isKeyPressed(KeyCode.UP);
+        boolean z = Input.isKeyPressed(KeyCode.Z);
+        boolean x = Input.isKeyPressed(KeyCode.X);
 
         double ax;
 
         if (droite && !gauche) {
-            ax = +300;
+            ax = 300;
         } else if (gauche && !droite) {
             ax = -300;
         } else {
             if (velocite.getX() < 400) {
-                ax = +300;
+                ax = 300;
             } else if (velocite.getX() > 400) {
                 ax = -300;
             } else {
@@ -99,7 +114,7 @@ public class Camelot extends ObjetDuJeu {
             toucherSol = false;
         }
 
-        if (cooldown <= 0 && Input.isKeyPressed(KeyCode.Z)) {
+        if (cooldown <= 0 && z && !zEtaitEnfoncee) {
             if (Input.isKeyPressed(KeyCode.SHIFT)) {
                 creerJournal(new Point2D(990, -990));
             } else {
@@ -107,7 +122,7 @@ public class Camelot extends ObjetDuJeu {
             }
         }
 
-        if (cooldown <= 0 && Input.isKeyPressed(KeyCode.X)) {
+        if (cooldown <= 0 && x && !xEtaitEnfoncee) {
             if (Input.isKeyPressed(KeyCode.SHIFT)) {
                 creerJournal(new Point2D(165, -1210));
             } else {
@@ -115,6 +130,8 @@ public class Camelot extends ObjetDuJeu {
             }
         }
 
+        zEtaitEnfoncee = z;
+        xEtaitEnfoncee = x;
 
         cooldown -= deltaTemps;
 
@@ -138,13 +155,14 @@ public class Camelot extends ObjetDuJeu {
                 Math.clamp(velocite.getX(), 200, 600),
                 velocite.getY()
         );
-        System.out.println("Velocite: " + velocite.getX());
-        System.out.println("Position: " + position.getX());
-        System.out.println("Acceleration: " + acceleration.getX());
 
     }
 
     private void creerJournal(Point2D pos) {
+        if (Partie.nbJournal <= 0) {
+            return;
+        }
+        Partie.nbJournal = Partie.nbJournal - 1;
 
         if (Input.isKeyPressed(KeyCode.SHIFT)) {
             pos = pos.multiply(1.5);
@@ -152,7 +170,7 @@ public class Camelot extends ObjetDuJeu {
 
         Point2D positionCentral = getCentre();
 
-        Journal j = new Journal(partie, positionCentral, this.velocite, pos, Partie.masseJournaux);
+        Journal j = new Journal(positionCentral, this.velocite, pos, Partie.masseJournaux,partie);
 
         Partie.journaux.add(j);
 

@@ -46,4 +46,8 @@ public class Maison {
         return abonnee;
     }
 
+    public Point2D getPosition(Camera camera) {
+        Point2D posMonde = new Point2D(x, 250);
+        return posMonde;
+    }
 }

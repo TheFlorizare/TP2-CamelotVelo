@@ -1,12 +1,13 @@
 package ca.qc.bdeb.sim.tp2camelotvelo;
 
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
+
 
 import java.util.HashSet;
 import java.util.Set;
 
 public class Input {
+
 
     private static final Set<KeyCode> touches = new HashSet<>();
 
@@ -22,7 +23,9 @@ public class Input {
             touches.remove(code);
         }
     }
+    public static void reset() {
+        touches.clear();
+    }
+
 
 }
-
- 

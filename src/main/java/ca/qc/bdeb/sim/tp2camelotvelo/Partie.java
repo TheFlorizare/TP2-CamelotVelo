@@ -10,74 +10,120 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class Partie {
-
-    private final Random r = new Random();
-
-    private final Camelot camelot;
-    private final Camera camera;
-
-    private final Maison[] maisons = new Maison[12];
-    private final BoiteAuxLettre[] boites = new BoiteAuxLettre[12];
-    private final Fenetre[] fenetres = new Fenetre[nombreFenetre()];
-    public static ArrayList<ParticulesChargees> particules = new ArrayList<>();
-    public static ArrayList<ParticulesChargees> particulesDebogage = new ArrayList<>();
-    public static ArrayList<Journal> journaux = new ArrayList<>();
-
-    private final Image brique;
-    private final Image ImgJournal = new Image(getClass().getResourceAsStream("/Assets/icone-journal.png"));
-    private final Image ImgArgent = new Image(getClass().getResourceAsStream("/Assets/icone-dollar.png"));
-    private final Image ImgMaison = new Image(getClass().getResourceAsStream("/Assets/icone-maison.png"));
-    private final Image ImgPorte = new Image(getClass().getResourceAsStream("/Assets/porte.png"));
-
     public static double masseJournaux;
-    public static final double LARGEUR_NIVEAU = 100000;
-    private int nbJournal = 12;
-    private int nbArgent = 0;
+    private Maison[] maisons = new Maison[12];
+    private Random r = new Random();
+    private BoiteAuxLettre[] boites = new BoiteAuxLettre[12];
+    private ArrayList<Fenetre>[] fenetresParMaison = new ArrayList[12];
+    public static ArrayList<Journal> journaux = new ArrayList<>();
+    public static ArrayList<ParticulesChargees> particules = new ArrayList<>();
+    private Camelot camelot;
+    private Camera camera;
+    private Image brique;
+    private Image ImgJournal;
+    private Image ImgArgent;
+    private Image ImgMaison;
+    private Image ImgPorte;
+    public static final double LARGEUR_NIVEAU = 999999999;
+    public static int nbJournal = 12;
+    public static int nbArgent = 0;
+    private int niveau;
     private double espace = 300;
-    private boolean niveau2 = false;
 
     private boolean modeDebogage = false;
     private boolean modeDebogageChamp = false;
-    private boolean modeDebogageChampTest = false;
-    private boolean creationParticulesDebogage = false;
 
-    private int nombreFenetre() {
-        Random r = new Random();
+    private double xFinNiveau;
+    private boolean niveauTermine = false;
 
-        int nbFenetreInitiale = 12;
-        int ajoutFenetre = r.nextInt(12);
-        int fenetreTotal = (nbFenetreInitiale + ajoutFenetre);
-        return fenetreTotal;
-    }
 
-    Partie() {
+    public Partie(int niveau) {
+
+        this.niveau = niveau;
+
+
+        masseJournaux = r.nextDouble(2);
+        journaux.clear();
+        particules.clear();
+
 
         camelot = new Camelot(this);
         camera = new Camera(MainJavaFX.WIDTH);
+
+
         brique = new Image(getClass().getResource("/Assets/brique.png").toExternalForm());
+        ImgJournal = new Image(getClass().getResourceAsStream("/Assets/icone-journal.png"));
+        ImgArgent = new Image(getClass().getResourceAsStream("/Assets/icone-dollar.png"));
+        ImgMaison = new Image(getClass().getResourceAsStream("/Assets/icone-maison.png"));
+        ImgPorte = new Image(getClass().getResourceAsStream("/Assets/porte.png"));
+
+
+        if (niveau >= 2) {
+            creationParticules();
+        }
+
 
         int adresse = 100 + r.nextInt(851);
         double xMaison = 1300;
-        masseJournaux = r.nextDouble(2);
-        creationParticules();
 
         for (int i = 0; i < maisons.length; i++) {
 
             boolean abonnee = r.nextBoolean();
-
             maisons[i] = new Maison(xMaison, adresse, abonnee);
 
             adresse += 2;
-
             xMaison += 1300;
         }
+        xFinNiveau = xMaison;
+
+
+        for (int i = 0; i < fenetresParMaison.length; i++) {
+
+            fenetresParMaison[i] = new ArrayList<>();
+            Maison m = maisons[i];
+
+            int nbF = r.nextInt(3); // 0, 1 ou 2 fenêtres
+
+            for (int f = 0; f < nbF; f++) {
+
+                double xFenetre = m.getPosition(camera).getX() + 400 + f * 250;
+                double yFenetre = m.getPosition(camera).getY() - 175;
+
+                boolean abonneeFenetre = m.isAbonnee();
+
+                fenetresParMaison[i].add(
+                        new Fenetre(xFenetre, yFenetre, abonneeFenetre)
+                );
+            }
+        }
+
+
+        for (int i = 0; i < boites.length; i++) {
+
+            Maison m = maisons[i];
+
+            double xBoite = m.getPosition(camera).getX() + 250;
+
+            double minY = 200;
+            double maxY = MainJavaFX.HEIGHT - 150;
+            double yBoite = minY + r.nextDouble() * (maxY - minY);
+
+            boolean abonnee = m.isAbonnee();
+
+            boites[i] = new BoiteAuxLettre(xBoite, yBoite, abonnee);
+        }
+
+
     }
 
+
     public void draw(GraphicsContext context) {
+
 
         double w = brique.getWidth();
         double h = brique.getHeight();
         context.setFill(Color.rgb(0, 0, 0, 0.5));
+
 
         for (double x = 0; x < LARGEUR_NIVEAU; x += w) {
             for (double y = 0; y < MainJavaFX.HEIGHT; y += h) {
@@ -91,7 +137,6 @@ public class Partie {
         }
 
         context.fillRect(0, 0, MainJavaFX.WIDTH, 50);
-
         context.drawImage(ImgJournal, 10, 10);
 
         context.drawImage(ImgArgent, 110, 15);
@@ -100,8 +145,8 @@ public class Partie {
 
         context.setFill(Color.rgb(255, 255, 255, 0.5));
         context.setFont(new Font(30));
-        context.fillText(String.valueOf(journaux.size()), ImgJournal.getWidth() + 20, 35);
-        context.fillText(String.valueOf(nbArgent) + "$", 170, 35);
+        context.fillText(String.valueOf(nbJournal), ImgJournal.getWidth() + 20, 35);
+        context.fillText(nbArgent + "$", 170, 35);
 
         for (Maison m : maisons) {
             m.draw(context, camera);
@@ -110,181 +155,147 @@ public class Partie {
                 espace += 55;
             }
         }
+        for (BoiteAuxLettre b : boites) {
+            if (b != null) {
+                b.draw(context, camera, modeDebogage);
+            }
+        }
+
+        for (ArrayList<Fenetre> liste : fenetresParMaison) {
+            for (Fenetre f : liste) {
+                f.draw(context, camera, modeDebogage);
+            }
+        }
+
+
         espace = 250;
-
         for (Journal j : journaux) {
-            j.draw(context, camera);
+            j.draw(context, camera, modeDebogage);
         }
 
-        camelot.draw(context, camera);
 
-        if (!niveau2) {
+        camelot.draw(context, camera, modeDebogage);
+
+        if (niveau >= 2) {
             for (ParticulesChargees p : particules) {
-                p.draw(context, camera);
+                p.draw(context, camera, modeDebogage);
             }
         }
+        if (modeDebogageChamp && niveau >= 2) {
 
-        if (modeDebogageChamp) {
-            if (!niveau2) {
-                for (double x = 0; x < LARGEUR_NIVEAU; x +=50) {
-                    for (double y = 0; y < MainJavaFX.HEIGHT; y +=50) {
+            for (double x = 0; x < LARGEUR_NIVEAU; x += 50) {
+                for (double y = 0; y < MainJavaFX.HEIGHT; y += 50) {
 
-                        var positionMonde = new Point2D(x,y);
-                        var positionEcran = camera.coordEcran(positionMonde);
+                    Point2D posMonde = new Point2D(x, y);
+                    Point2D posEcran = camera.coordEcran(posMonde);
 
-                        if (positionEcran.getX() < 0 || positionEcran.getX() > MainJavaFX.WIDTH) {
-                            continue;
-                        }
 
-                        Point2D force = champElectrique(particules, positionMonde);
+                    if (posEcran.getX() < 0 || posEcran.getX() > MainJavaFX.WIDTH) continue;
 
-                        UtilitairesDessins.dessinerVecteurForce(positionEcran, force, context);
-                    }
-                }
-            }
-            else {
-                return;
-            }
-        }
-        else if (modeDebogageChampTest) {
-            for (double x = 0; x < LARGEUR_NIVEAU; x +=50) {
-                for (double y = 0; y < MainJavaFX.HEIGHT; y +=50) {
-
-                    var positionMonde = new Point2D(x,y);
-                    var positionEcran = camera.coordEcran(positionMonde);
-
-                    if (positionEcran.getX() < 0 || positionEcran.getX() > MainJavaFX.WIDTH) {
-                        continue;
-                    }
-
-                    Point2D force = champElectrique(particulesDebogage, positionMonde);
-
-                    UtilitairesDessins.dessinerVecteurForce(positionEcran, force, context);
+                    Point2D force = champElectrique(particules, posMonde);
+                    UtilitairesDessins.dessinerVecteurForce(posEcran, force, context);
                 }
             }
         }
 
         if (modeDebogage) {
-            context.setLineWidth(2);
             context.setStroke(Color.YELLOW);
-
-            for (Journal j : journaux) {
-                Point2D position = camera.coordEcran(j.position);
-                context.strokeRect(position.getX(), position.getY(), j.taille.getX(), j.taille.getY());
-            }
-
-            for (Fenetre f : fenetres) {
-                Point2D positionFenetre = camera.coordEcran(f.position);
-                context.strokeRect(positionFenetre.getX(), positionFenetre.getY(), f.taille.getX(), f.taille.getY());
-            }
-
-            for (BoiteAuxLettre b : boites) {
-                Point2D positionBoite = camera.coordEcran(b.position);
-                context.strokeRect(positionBoite.getX(), positionBoite.getY(), b.taille.getX(), b.taille.getY());
-            }
-
-            // Dessin de la boite de collision du camelot
-            Point2D positionCamelot = camera.coordEcran(camelot.position);
-            context.strokeRect(positionCamelot.getX(), positionCamelot.getY(), camelot.taille.getX(), camelot.taille.getY());
-
+            context.strokeLine(MainJavaFX.WIDTH * 0.2, 0, MainJavaFX.WIDTH * 0.2, MainJavaFX.HEIGHT);
         }
 
-        if (modeDebogageChampTest && !creationParticulesDebogage) {
 
-            particulesDebogage.clear();
-
-            double haut = 10;
-            double bas = MainJavaFX.HEIGHT - 10;
-            double espace = 0;
-
-
-            for (int i = 0; i < 100; i++) {
-
-                particulesDebogage.add(new ParticulesChargees(espace, haut));
-                particulesDebogage.add(new ParticulesChargees(espace, bas));
-                espace += 50;
-
-            }
-
-            creationParticulesDebogage = true;
-        }
-
-        if (modeDebogageChampTest) {
-
-            for (ParticulesChargees p : particulesDebogage) {
-                Point2D position = camera.coordEcran(p.position);
-                context.setFill(p.couleur);
-                context.fillOval(position.getX() - 4, position.getY() - 4, 20, 20);
-            }
-        }
     }
+
 
     public void update(double deltaTemps) {
 
         camelot.update(deltaTemps);
         camera.update(camelot);
 
+
         for (int i = journaux.size() - 1; i >= 0; i--) {
+
             Journal j = journaux.get(i);
 
+
             j.update(deltaTemps);
+
+
+            Point2D posEcran = camera.coordEcran(j.getPosition());
+
+            boolean horsEcranDefinitif =
+                    posEcran.getX() < -200
+                            || posEcran.getX() > MainJavaFX.WIDTH + 200
+                            || posEcran.getY() > MainJavaFX.HEIGHT + 200;
+
+            if (horsEcranDefinitif) {
+                journaux.remove(i);
+                continue;
+            }
+
 
             if (!j.estPresent()) {
                 journaux.remove(i);
                 continue;
             }
 
-            for (BoiteAuxLettre b : boites) {
-                if (b != null && j.collision(b)) {
-                    collisionBoite(j, b);
+
+            for (ArrayList<Fenetre> listeFenetre : fenetresParMaison) {
+                if (listeFenetre == null) continue;
+
+                for (Fenetre f : listeFenetre) {
+                    if (f != null) {
+                        f.collisionAvecJournalFenetres(j);
+                    }
                 }
             }
 
-            for (Fenetre f : fenetres) {
-                if (f != null && j.collision(f)) {
-                    collisionFenetre(j, f);
+            for (BoiteAuxLettre b : boites) {
+                if (b != null) {
+                    b.collisionAvecJournalBoites(j);
                 }
             }
         }
+
+
+        if (!niveauTermine && camelot.getPosition().getX() > xFinNiveau) {
+            niveauTermine = true;
+        }
     }
+
 
     public void creationParticules() {
-        if (!niveau2) {
-            for (int i = 0; i<100; i++) {
-                particules.add(new ParticulesChargees(r.nextDouble(LARGEUR_NIVEAU), r.nextDouble(MainJavaFX.HEIGHT)));
-            }
+        particules.clear();
+
+        if (niveau < 2) {
+            return;
+        }
+
+        int nbParticules = Math.min((niveau - 1) * 30, 400);
+
+        double maxX = 10000;
+
+        for (int i = 0; i < nbParticules; i++) {
+            particules.add(
+                    new ParticulesChargees(
+                            r.nextDouble(maxX),
+                            r.nextDouble(MainJavaFX.HEIGHT)
+                    )
+            );
         }
     }
 
-    private void collisionBoite(Journal j, BoiteAuxLettre b) {
-
-        j.detruire();
-
-        if (!b.devientVert()) {
-            nbArgent += 1;
-        }
-    }
-
-    private void collisionFenetre(Journal j, Fenetre f) {
-
-        j.detruire();
-
-        if (!f.estCasseVert()) {
-            nbArgent += 2;
-        }
-
-        if (!f.estCasseRouge()) {
-            nbArgent -= 2;
-        }
-    }
 
     public Point2D champElectrique(ArrayList<ParticulesChargees> particules, Point2D position) {
+
+        if (niveau < 2) {
+            return Point2D.ZERO;
+        }
 
         Point2D total = Point2D.ZERO;
 
         for (ParticulesChargees p : particules) {
-
-            double dx = position.getX() - p.position.getX(); // posX journal - posX particule
+            double dx = position.getX() - p.position.getX();
             double dy = position.getY() - p.position.getY();
             double distance = Math.sqrt(dx * dx + dy * dy);
 
@@ -292,8 +303,7 @@ public class Partie {
                 distance = 1;
             }
 
-            double Ei = 90*900 / (distance*distance); // K*q/r2
-
+            double Ei = 90 * 900 / (distance * distance);
             Point2D direction = new Point2D(dx, dy).normalize();
 
             total = total.add(direction.multiply(Ei));
@@ -301,36 +311,41 @@ public class Partie {
         return total;
     }
 
+
     public ArrayList<ParticulesChargees> getParticules() {
         return particules;
     }
 
-    public ArrayList<ParticulesChargees> getParticulesDebogage() {
-        return particulesDebogage;
-    }
-
-    public void ajoutJournauxDebogage() {
-        nbJournal += 10;
-    }
-
-    public void suppressionJournauxDebogage() {
-        nbJournal = 0;
-    }
-
-    public void prochainNiveauDebogage() {
-        niveau2 = true;
-    }
-
-    public void activerDebogage() {
+    public void ouvrirDebogage() {
         modeDebogage = !modeDebogage;
     }
 
-    public void activerDebogageChamp() {
+    public void ouvrirDebogageChamp() {
         modeDebogageChamp = !modeDebogageChamp;
     }
 
-    public void activerDebogageChampTest() {
-        modeDebogageChampTest = !modeDebogageChampTest;
+    public boolean isNiveauTermine() {
+        return niveauTermine;
+    }
+
+    public void creerParticulesTest() {
+        particules.clear();
+
+        double maxX = 20000;
+
+
+        for (double x = 0; x < maxX; x += 50) {
+            particules.add(new ParticulesChargees(x, 10));
+        }
+
+        double yBas = MainJavaFX.HEIGHT - 10;
+        for (double x = 0; x < maxX; x += 50) {
+            particules.add(new ParticulesChargees(x, yBas));
+        }
+    }
+
+
+    public void forceNiveauTermine() {
+        this.niveauTermine = true;
     }
 }
-
